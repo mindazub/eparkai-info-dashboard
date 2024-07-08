@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solar Park Projects</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -26,7 +27,7 @@
             }, 5000);
         </script>
         {% endif %}
-        <table class="table table-striped mt-3">
+        <table id="projectsTable" class="table table-striped mt-3">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -36,11 +37,11 @@
                     <th>Old Price</th>
                     <th>Maintenance Price</th>
                     <th>Status</th>
-                    <th>Total</th>
-                    <th>Progress</th>
-                    <th>Reserved</th>
+                    <th>Total kW</th>
+                    <th>Progress (%)</th>
+                    <th>Reserved (%)</th>
                     <th>Reserved kW</th>
-                    <th>Remaining</th>
+                    <th>Remaining (%)</th>
                     <th>Remaining kW</th>
                 </tr>
             </thead>
@@ -50,16 +51,16 @@
                     <td>{{ project[0] }}</td>
                     <td><img src="{{ project[1] }}" alt="Image" width="100"></td>
                     <td><img src="{{ project[2] }}" alt="Small Image" width="100"></td>
-                    <td>{{ project[3] }}</td>
-                    <td>{{ project[4] }}</td>
-                    <td>{{ project[5] }}</td>
+                    <td data-order="{{ project[3] }}">{{ project[3] }}</td>
+                    <td data-order="{{ project[4] }}">{{ project[4] }}</td>
+                    <td data-order="{{ project[5] }}">{{ project[5] }}</td>
                     <td>{{ project[6] }}</td>
-                    <td>{{ project[7] }}</td>
-                    <td>{{ project[8] }}</td>
-                    <td>{{ project[9] }}</td>
-                    <td>{{ project[10] }}</td>
-                    <td>{{ project[11] }}</td>
-                    <td>{{ project[12] }}</td>
+                    <td data-order="{{ project[7] }}">{{ project[7] }}</td>
+                    <td data-order="{{ project[8] }}">{{ project[8] }}</td>
+                    <td data-order="{{ project[9] }}">{{ project[9] }}</td>
+                    <td data-order="{{ project[10] }}">{{ project[10] }}</td>
+                    <td data-order="{{ project[11] }}">{{ project[11] }}</td>
+                    <td data-order="{{ project[12] }}">{{ project[12] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -91,5 +92,28 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-beta2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#projectsTable').DataTable({
+                "columns": [
+                    null, // Title
+                    { "orderable": false }, // Image
+                    { "orderable": false }, // Small Image
+                    { "type": "num" }, // Purchase Price
+                    { "type": "num" }, // Old Price
+                    { "type": "num" }, // Maintenance Price
+                    null, // Status
+                    { "type": "num" }, // Total kW
+                    { "type": "num" }, // Progress (%)
+                    { "type": "num" }, // Reserved (%)
+                    { "type": "num" }, // Reserved kW
+                    { "type": "num" }, // Remaining (%)
+                    { "type": "num" } // Remaining kW
+                ]
+            });
+        });
+    </script>
 </body>
 </html>

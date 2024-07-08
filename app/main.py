@@ -18,8 +18,8 @@ def find_and_delete_duplicates():
     c.execute('''DELETE FROM projects WHERE rowid NOT IN (
                   SELECT MIN(rowid) 
                   FROM projects 
-                  GROUP BY title, image_url, small_image_url, purchase_price_info, old_price, maintenance_price_info,
-                  status, total_text, progress_percentage, reserved_info, reserved_kw, remaining_info, remaining_kw
+                  GROUP BY title, image_url, small_image_url, purchase_price, old_price, maintenance_price,
+                  status, total_kw, progress_percentage, reserved_percentage, reserved_kw, remaining_percentage, remaining_kw
                   )''')
     conn.commit()
     conn.close()
