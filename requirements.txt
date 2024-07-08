@@ -1,0 +1,7 @@
+requests
+BeautifulSoup
+sqlite3
+datetime
+re
+fastapi 
+asyncio
