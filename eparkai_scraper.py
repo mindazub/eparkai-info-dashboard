@@ -1,6 +1,41 @@
 import requests
 from bs4 import BeautifulSoup
-import json
+import sqlite3
+from datetime import datetime
+
+db_name = 'eparkai_projects.db'
+base_url = 'https://www.eparkai.lt'
+
+def create_table():
+    conn = sqlite3.connect(db_name)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS projects (
+                 title TEXT,
+                 image_url TEXT,
+                 small_image_url TEXT,
+                 purchase_price_info TEXT,
+                 old_price TEXT,
+                 maintenance_price_info TEXT,
+                 status TEXT,
+                 total_text TEXT,
+                 progress_percentage TEXT,
+                 reserved_info TEXT,
+                 reserved_kw TEXT,
+                 remaining_info TEXT,
+                 remaining_kw TEXT
+                 )''')
+    conn.commit()
+    conn.close()
+
+def insert_data(data):
+    conn = sqlite3.connect(db_name)
+    c = conn.cursor()
+    c.executemany('''INSERT INTO projects (
+                     title, image_url, small_image_url, purchase_price_info, old_price, maintenance_price_info,
+                     status, total_text, progress_percentage, reserved_info, reserved_kw, remaining_info, remaining_kw
+                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', data)
+    conn.commit()
+    conn.close()
 
 def fetch_project_data(page_number):
     print(f"Fetching data from page {page_number}...")
@@ -20,10 +55,10 @@ def fetch_project_data(page_number):
     for project in projects:
         title = project.find('h3', class_='project-title').text.strip()
         image_tag = project.find('div', class_='project-image').find('img')
-        image_url = image_tag['src'] if image_tag else ''
+        image_url = base_url + image_tag['src'] if image_tag else ''
         
         contractor_image_tag = project.find('div', class_='contractor-wrapper').find('img')
-        small_image_url = contractor_image_tag['src'] if contractor_image_tag else ''
+        small_image_url = base_url + contractor_image_tag['src'] if contractor_image_tag else ''
 
         status = 'YRAGALIOS' if 'project-status-sold' not in project['class'] else 'ISPARDUOTA'
         
@@ -54,26 +89,15 @@ def fetch_project_data(page_number):
         remaining_info = project_info_wrapper_stats.find('p', class_='right').text.strip().replace('\n', ' ')
         remaining_kw = project_info_wrapper_stats.find('p', class_='right').find('span', class_='desc').text.strip()
 
-        project_list.append({
-            'title': title,
-            'image_url': image_url,
-            'small_image_url': small_image_url,
-            'purchase_price_info': purchase_price_info,
-            'old_price': old_price,
-            'maintenance_price_info': maintenance_price_info,
-            'status': status,
-            'total_text': total_text,
-            'progress_percentage': progress_percentage,
-            'reserved_info': reserved_info,
-            'reserved_kw': reserved_kw,
-            'remaining_info': remaining_info,
-            'remaining_kw': remaining_kw
-        })
+        project_list.append((
+            title, image_url, small_image_url, purchase_price_info, old_price, maintenance_price_info,
+            status, total_text, progress_percentage, reserved_info, reserved_kw, remaining_info, remaining_kw
+        ))
 
     print(f"Found {len(project_list)} projects on page {page_number}.")
     return project_list
 
-def fetch_all_projects():
+async def fetch_all_projects():
     all_projects = []
     for page_number in range(4):  # Limiting to pages 0, 1, 2, 3
         projects = fetch_project_data(page_number)
@@ -83,14 +107,6 @@ def fetch_all_projects():
 
     return all_projects
 
-print("Starting to fetch all projects...")
-projects = fetch_all_projects()
-print("Finished fetching all projects.")
-
-# Saving the data to a JSON file
-output_file = 'eparkai_projects.json'
-with open(output_file, 'w', encoding='utf-8') as f:
-    json.dump(projects, f, ensure_ascii=False, indent=4)
-
-print(f"Data saved to {output_file}")
-print("Script finished successfully.")
+def save_projects_to_db(projects):
+    create_table()
+    insert_data(projects)
