@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 import asyncio
 import sqlite3
+import os
 from eparkai_scraper import fetch_all_projects, save_projects_to_db, create_table
 
 app = FastAPI()
@@ -137,3 +138,8 @@ async def set_items_per_page(request: Request, items_per_page: int = Form(...)):
             "items_per_page": items_per_page,
             "total_pages": 0
         })
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
